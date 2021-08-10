@@ -41,4 +41,10 @@ io.on("connection", (socket) => {
     console.log("a user disconnected!");
     removeUser(socket.id);
   });
+
+  // when call to join room
+  socket.on('join-room', room => {
+    socket.join(room)
+    // room can be any name 
+  })
 });
