@@ -6,10 +6,11 @@ var logger = require('morgan');
 var cors = require('cors');
 var io = require('socket.io')(8900, {
   cors: {
-    origin: "http://localhost:19006",
+    origin: "*",
   },
 });
 
+var axios = require('axios');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -59,7 +60,7 @@ const removeUser = (socketId) => {
 };
 
 const getUser = (userId) => {
-  return users.find((user) => user.userId === userId);
+  return users.find((user) => user.username === userId);
 };
 
 io.on("connection", (socket) => {
@@ -73,9 +74,12 @@ io.on("connection", (socket) => {
   });
 
   //send and get message
-  socket.on('newMsg', (msgs, room) => {
+  socket.on('newMsg', (msgs, room, username) => {
     console.log(room, msgs)
-    socket.to(room).emit('rcv-msg', msgs);
+    if (username.length === 0)
+      socket.to(room).emit('rcv-msg', msgs);
+    else
+      socket.to(getUser(username).socketId).emit('rcv-msg', msgs);
   })
   //when disconnect
   socket.on("disconnect", () => {
@@ -87,6 +91,16 @@ io.on("connection", (socket) => {
   socket.on('join-room', room => {
     socket.join(room)
     // room can be any name 
+  })
+  socket.on('leave-room', room => {
+    console.log('User Left ' + room)
+    socket.leave(room)
+    console.log(socket.rooms)
+    // room can be any name 
+  })
+
+  socket.on('typing', (username, room) => {
+    socket.to(room).emit('isTyping', username)
   })
 });
 

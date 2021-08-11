@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, StyleSheet, TextInput, View, Text, FlatList, Platform, TouchableHighlight } from 'react-native';
 import { io } from 'socket.io-client';
 import { nanoid } from 'nanoid';
-
+import { AntDesign } from '@expo/vector-icons';
 
 export default function App({ navigation, route }) {
     const roomname = route.params.room
@@ -12,7 +12,14 @@ export default function App({ navigation, route }) {
     const [socket] = React.useState(io('ws://localhost:8900'))
     const [msgs, setmsgs] = React.useState([])
     const [newmsgs, setnewmsgs] = React.useState('')
+
     React.useEffect(() => {
+        navigation.setOptions({
+            headerLeft: () => (
+                <AntDesign name="stepbackward" size={24} color="black" onPress={() => { socket.emit('leave-room', roomname); navigation.goBack() }} />
+            ),
+        });
+
         socket.emit("join-room", roomname);
         socket.emit("addUser", { username, userId, roomname });
         socket.on('rcv-msg', (new_msgs) => {
@@ -20,9 +27,21 @@ export default function App({ navigation, route }) {
             setmsgs(new_msgs)
         })
     }, [])
+
+    React.useEffect(() => {
+        socket.on('typing', (username) => {
+            navigation.setOptions({
+                headerRight: () => (
+                    <Text>{username} is typing</Text>
+                ),
+            });
+        })
+    })
+
     const handleOnpress = (e) => {
         e.preventDefault()
-        socket.emit('newMsg', [...msgs, newmsgs], roomname)
+        socket.emit('newMsg', [...msgs, newmsgs], roomname, 'abdul rehman')
+        socket.emit('typing', '', roomname)
         setmsgs([...msgs, newmsgs])
         setnewmsgs('')
     }
@@ -46,7 +65,7 @@ export default function App({ navigation, route }) {
                 data={msgs}
                 renderItem={({ item, index, separators }) => (
                     <TouchableHighlight
-                        key={index}
+                        key={String(index)}
                         onPress={() => console.log(item, ' is pressed')}
                         onShowUnderlay={separators.highlight}
                         onHideUnderlay={separators.unhighlight}>
@@ -69,7 +88,10 @@ export default function App({ navigation, route }) {
             }
             <TextInput
                 value={newmsgs}
-                onChangeText={(text) => setnewmsgs(text)}
+                onChangeText={(text) => {
+                    setnewmsgs(text);
+                    socket.emit('typing', username, roomname)
+                }}
                 placeholder='Enter Your Message here'
                 style={styles.textArea}
             />
