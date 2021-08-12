@@ -29,10 +29,10 @@ export default function App({ navigation, route }) {
     }, [])
 
     React.useEffect(() => {
-        socket.on('typing', (username) => {
+        socket.on('isTyping', (username) => {
             navigation.setOptions({
                 headerRight: () => (
-                    <Text>{username} is typing</Text>
+                    <Text>{username.length > 0 ? username + ' is Typing...' : ''}</Text>
                 ),
             });
         })
@@ -40,7 +40,7 @@ export default function App({ navigation, route }) {
 
     const handleOnpress = (e) => {
         e.preventDefault()
-        socket.emit('newMsg', [...msgs, newmsgs], roomname, 'abdul rehman')
+        socket.emit('newMsg', [...msgs, newmsgs], roomname)
         socket.emit('typing', '', roomname)
         setmsgs([...msgs, newmsgs])
         setnewmsgs('')
@@ -63,14 +63,14 @@ export default function App({ navigation, route }) {
                     ))
                 }
                 data={msgs}
+                keyExtractor={item => String(item._id)}
                 renderItem={({ item, index, separators }) => (
                     <TouchableHighlight
-                        key={String(index)}
                         onPress={() => console.log(item, ' is pressed')}
                         onShowUnderlay={separators.highlight}
                         onHideUnderlay={separators.unhighlight}>
                         <View style={{ backgroundColor: 'white' }}>
-                            <Text>{item}</Text>
+                            <Text>{item.data}</Text>
                         </View>
                     </TouchableHighlight>
                 )}

@@ -10,11 +10,21 @@ var io = require('socket.io')(8900, {
   },
 });
 
+var mongoose = require('mongoose');
+
 var axios = require('axios');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
+
+const connection = mongoose.connect('mongodb://localhost:27017/diewithme', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+connection.then((db) => {
+  console.log("Connected correctly to server");
+}, (err) => { console.log(err); });
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -59,27 +69,35 @@ const removeUser = (socketId) => {
   console.log(users)
 };
 
-const getUser = (userId) => {
-  return users.find((user) => user.username === userId);
+const getUser = (socketId) => {
+  return users.find((user) => user.socketId === socketId);
 };
 
 io.on("connection", (socket) => {
   //when ceonnect
-
   //take userId and socketId from user
   socket.on("addUser", ({ username, userId, roomname }) => {
     addUser({ username, userId, roomname, socketId: socket.id })
-    console.log(users)
     io.emit("getUsers", users);
   });
 
   //send and get message
-  socket.on('newMsg', (msgs, room, username) => {
-    console.log(room, msgs)
-    if (username.length === 0)
-      socket.to(room).emit('rcv-msg', msgs);
-    else
-      socket.to(getUser(username).socketId).emit('rcv-msg', msgs);
+  socket.on('newMsg', (msgs, room) => {
+    const user = getUser(socket.id)
+    console.log(msgs[msgs.length - 1])
+    const data = {
+      userId: String(user.userId),
+      data: msgs[msgs.length - 1],
+      room: room,
+    } 
+    axios.post('http://localhost:3000/users/newMsg', data)
+      .then(res => {
+        console.log(res.data)
+        if (res.data.success) {
+          socket.to(room).emit('rcv-msg', res.data.msg);
+        }
+      })
+
   })
   //when disconnect
   socket.on("disconnect", () => {
@@ -93,9 +111,7 @@ io.on("connection", (socket) => {
     // room can be any name 
   })
   socket.on('leave-room', room => {
-    console.log('User Left ' + room)
     socket.leave(room)
-    console.log(socket.rooms)
     // room can be any name 
   })
 

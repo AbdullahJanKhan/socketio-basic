@@ -48,22 +48,33 @@ router.patch('/likedMsg/:uid/:likedId', (req, res) => {
 
 router.post('/newMsg', (req, res) => {
   const data = req.body.data;
-  const userId = req.user._id;
+  const userId = req.body.userId;
   const room = req.body.room;
   const msg = new Msg({
     data, userId, room
   })
+  console.log(msg)
   msg.save((err, savedmsg) => {
     if (err)
       res.json({
         err: err.name,
         success: false
       })
-    else
-      res.json({
-        msg: savedmsg,
-        success: true
+    else {
+      Msg.find({ room: room }, (err, msgs) => {
+        if (err) {
+          res.json({
+            err: err.name,
+            success: false
+          })
+        }
+        else
+          res.json({
+            msg: msgs,
+            success: true
+          })
       })
+    }
   })
 })
 
