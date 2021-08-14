@@ -1,18 +1,18 @@
 import React from 'react';
 import { Button, StyleSheet, TextInput, View, Text, FlatList, Platform, TouchableHighlight } from 'react-native';
 import { io } from 'socket.io-client';
-import { nanoid } from 'nanoid';
 import { AntDesign } from '@expo/vector-icons';
 
 export default function App({ navigation, route }) {
     const roomname = route.params.room
     const username = route.params.username
-    const userId = nanoid(10)
+    const userId = route.params.userId
 
     const [socket] = React.useState(io('ws://localhost:8900'))
     const [msgs, setmsgs] = React.useState([])
     const [newmsgs, setnewmsgs] = React.useState('')
 
+    // setting headeer | join room | add user | rcv msg
     React.useEffect(() => {
         navigation.setOptions({
             headerLeft: () => (
@@ -26,8 +26,11 @@ export default function App({ navigation, route }) {
             console.log(msgs, new_msgs)
             setmsgs(new_msgs)
         })
+        socket.on('newUser', (msgs) => {
+            setmsgs(msgs)
+        })
     }, [])
-
+    // typing event
     React.useEffect(() => {
         socket.on('isTyping', (username) => {
             navigation.setOptions({
@@ -37,7 +40,7 @@ export default function App({ navigation, route }) {
             });
         })
     })
-
+    // send message event
     const handleOnpress = (e) => {
         e.preventDefault()
         socket.emit('newMsg', [...msgs, newmsgs], roomname)

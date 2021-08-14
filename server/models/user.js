@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'Anonymous'
     },
-    likedMsgs: {
+    likes: {
         type: [mongoose.Types.ObjectId],
         ref: 'User',
         default: []

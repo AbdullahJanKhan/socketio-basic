@@ -5,12 +5,8 @@ const messageSchema = new mongoose.Schema({
         type: String
     },
     userId: {
-        type: String,
-    },
-    likedBy: {
-        type: [mongoose.Types.ObjectId],
-        ref: 'User',
-        default: []
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
     },
     room: {
         type: String,

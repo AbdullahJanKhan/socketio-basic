@@ -78,7 +78,12 @@ io.on("connection", (socket) => {
   //take userId and socketId from user
   socket.on("addUser", ({ username, userId, roomname }) => {
     addUser({ username, userId, roomname, socketId: socket.id })
-    io.emit("getUsers", users);
+    axios.get('http://localhost:3000/users/getMsgs/' + roomname)
+      .then(res => {
+        if (res.data.success) {
+          io.to(socket.id).emit('newUser', res.data.data)
+        }
+      })
   });
 
   //send and get message
@@ -89,12 +94,12 @@ io.on("connection", (socket) => {
       userId: String(user.userId),
       data: msgs[msgs.length - 1],
       room: room,
-    } 
+    }
     axios.post('http://localhost:3000/users/newMsg', data)
       .then(res => {
         console.log(res.data)
         if (res.data.success) {
-          socket.to(room).emit('rcv-msg', res.data.msg);
+          io.in(room).emit('rcv-msg', res.data.msg);
         }
       })
 

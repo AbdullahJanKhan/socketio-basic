@@ -5,7 +5,7 @@ import ChatScreen from './chatScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { nanoid } from 'nanoid';
+import axios from 'axios';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,9 +28,19 @@ function MainScreen({ navigation }) {
 
     const onPressRoom = (room) => {
         if (username.length > 0) {
-            navigation.navigate('Chat Room', { username, room })
+            const data = {
+                name: username
+            }
+            axios.post("http://localhost:3000/users/addUser", data)
+                .then(res => {
+                    if (res.data.success) {
+                        navigation.navigate('Chat Room', { username, room, userId: res.data.user._id })
+                    } else {
+                        alert(res.data.err)
+                    }
+                })
         } else {
-            alert('Enter your name first')
+            alert('Enter a username')
         }
     }
 

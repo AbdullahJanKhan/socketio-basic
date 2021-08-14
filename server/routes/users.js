@@ -9,7 +9,7 @@ router.get('/', function (req, res, next) {
   res.send('respond with a resource');
 });
 
-router.post('/add', (req, res) => {
+router.post('/addUser', (req, res) => {
   const name = req.body.name;
   const user = new User({
     name
@@ -28,23 +28,7 @@ router.post('/add', (req, res) => {
   })
 })
 
-router.patch('/likedMsg/:uid/:likedId', (req, res) => {
-  const likedId = req.params.likedId
-  const uId = req.params.uid
 
-  User.findOneAndUpdate({ '_id': uId }, { $push: { likedMsgs: likedId } }, (err, user) => {
-    if (err)
-      res.json({
-        err: err.name,
-        success: false
-      })
-    else
-      res.json({
-        user: user,
-        success: true
-      })
-  })
-})
 
 router.post('/newMsg', (req, res) => {
   const data = req.body.data;
@@ -75,6 +59,24 @@ router.post('/newMsg', (req, res) => {
           })
       })
     }
+  })
+})
+
+router.get('/getMsgs/:room', (req, res) => {
+  const room = req.params.room
+  Msg.find({ room }, (err, msgs) => {
+    console.log(msgs)
+    if (err)
+      res.json({
+        err: err.name,
+        success: false
+      })
+    else
+      res.json({
+        data: msgs,
+        success: true
+      })
+
   })
 })
 
