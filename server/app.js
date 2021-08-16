@@ -25,7 +25,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 
-const connection = mongoose.connect("mongodb+srv://abdullah-isee:admin@isee.qxzb7.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", {
+const connection = mongoose.connect("uri", {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
