@@ -26,7 +26,11 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 
+<<<<<<< HEAD
 const connection = mongoose.connect(process.env.MONGOURI, {
+=======
+const connection = mongoose.connect("uri", {
+>>>>>>> 4e73a83a80b292429a92d18fd64fd09a4527daa6
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
