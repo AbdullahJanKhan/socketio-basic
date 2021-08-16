@@ -7,6 +7,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
 var http = require('http');
+var dotenv = require('dotenv').config();
 
 var port = process.env.PORT || '3000';
 app.set('port', port);
@@ -25,7 +26,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 
-const connection = mongoose.connect("mongodb+srv://abdullah-isee:admin@isee.qxzb7.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", {
+const connection = mongoose.connect(process.env.MONGOURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
