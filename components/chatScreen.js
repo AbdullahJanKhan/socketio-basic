@@ -12,7 +12,7 @@ export default function App({ navigation, route }) {
     const [msgs, setmsgs] = React.useState([])
     const [newmsgs, setnewmsgs] = React.useState('')
 
-    // setting headeer | join room | add user | rcv msg
+    // setting header | join room | add user | rcv msg
     React.useEffect(() => {
         navigation.setOptions({
             headerLeft: () => (
@@ -48,6 +48,15 @@ export default function App({ navigation, route }) {
         setmsgs([...msgs, newmsgs])
         setnewmsgs('')
     }
+    // on item press
+    const itemPress = (item) => {
+        const data = {
+            uid: userId,
+            lid: item.userId
+        }
+        console.log(data)
+        socket.emit('msgLike', data)
+    }
 
 
     return (
@@ -69,7 +78,7 @@ export default function App({ navigation, route }) {
                 keyExtractor={item => String(item._id)}
                 renderItem={({ item, index, separators }) => (
                     <TouchableHighlight
-                        onPress={() => console.log(item, ' is pressed')}
+                        onPress={() => itemPress(item)}
                         onShowUnderlay={separators.highlight}
                         onHideUnderlay={separators.unhighlight}>
                         <View style={{ backgroundColor: 'white' }}>

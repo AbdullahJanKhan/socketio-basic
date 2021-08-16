@@ -123,6 +123,14 @@ io.on("connection", (socket) => {
   socket.on('typing', (username, room) => {
     socket.to(room).emit('isTyping', username)
   })
+
+  socket.on('msgLike', (data) => {
+    console.log(data)
+    axios.patch('http://localhost:3000/users/like', data)
+      .then(res => {
+        console.log(res.data)
+      })
+  })
 });
 
 module.exports = app;

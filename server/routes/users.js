@@ -28,8 +28,6 @@ router.post('/addUser', (req, res) => {
   })
 })
 
-
-
 router.post('/newMsg', (req, res) => {
   const data = req.body.data;
   const userId = req.body.userId;
@@ -78,6 +76,36 @@ router.get('/getMsgs/:room', (req, res) => {
       })
 
   })
+})
+
+router.patch('/like', (req, res) => {
+  const userId = req.body.uid;
+  const likeId = req.body.lid;
+
+  User.findOne({ '_id': likeId }, (err, user) => {
+    if (err) {
+      res.json({
+        err: err.name,
+        success: false
+      })
+    } else {
+      user.likes.push(userId)
+      user.save((err, user) => {
+        if (err) {
+          res.json({
+            err: err.name,
+            success: false
+          })
+        } else {
+          res.json({
+            user,
+            success: true
+          })
+        }
+      })
+    }
+  })
+
 })
 
 module.exports = router;
