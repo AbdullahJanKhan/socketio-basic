@@ -8,7 +8,7 @@ export default function App({ navigation, route }) {
     const username = route.params.username
     const userId = route.params.userId
 
-    const [socket] = React.useState(io('ws://localhost:8900'))
+    const [socket] = React.useState(io('https://diewithme-13.herokuapp.com/'))
     const [msgs, setmsgs] = React.useState([])
     const [newmsgs, setnewmsgs] = React.useState('')
 
@@ -19,14 +19,16 @@ export default function App({ navigation, route }) {
                 <AntDesign name="stepbackward" size={24} color="black" onPress={() => { socket.emit('leave-room', roomname); navigation.goBack() }} />
             ),
         });
+        console.log(socket)
 
         socket.emit("join-room", roomname);
         socket.emit("addUser", { username, userId, roomname });
         socket.on('rcv-msg', (new_msgs) => {
-            console.log(msgs, new_msgs)
+            console.log(msgs, new_msgs, 'test')
             setmsgs(new_msgs)
         })
         socket.on('newUser', (msgs) => {
+            console.log(msgs)
             setmsgs(msgs)
         })
     }, [])

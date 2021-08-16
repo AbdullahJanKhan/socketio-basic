@@ -31,7 +31,12 @@ function MainScreen({ navigation }) {
             const data = {
                 name: username
             }
-            axios.post("http://localhost:3000/users/addUser", data)
+            axios.post("https://diewithme-13.herokuapp.com/users/addUser", data, {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                }
+            })
                 .then(res => {
                     if (res.data.success) {
                         navigation.navigate('Chat Room', { username, room, userId: res.data.user._id })

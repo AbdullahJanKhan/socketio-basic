@@ -1,10 +1,18 @@
 var createError = require('http-errors');
 var express = require('express');
+var app = express();
+
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
-var io = require('socket.io')(8900, {
+var http = require('http');
+
+var port = process.env.PORT || '3000';
+app.set('port', port);
+
+var server = http.createServer(app)
+var io = require('socket.io')(server, {
   cors: {
     origin: "*",
   },
@@ -16,9 +24,8 @@ var axios = require('axios');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
-var app = express();
 
-const connection = mongoose.connect('mongodb://localhost:27017/diewithme', {
+const connection = mongoose.connect("mongodb+srv://abdullah-isee:admin@isee.qxzb7.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
@@ -36,6 +43,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
+
+app.get('/', (req, res) => res.send('Hello World'))
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -73,12 +82,16 @@ const getUser = (socketId) => {
   return users.find((user) => user.socketId === socketId);
 };
 
+const getUserId = (userId) => {
+  return users.find((user) => user.userId === userId);
+};
+
 io.on("connection", (socket) => {
   //when ceonnect
   //take userId and socketId from user
   socket.on("addUser", ({ username, userId, roomname }) => {
     addUser({ username, userId, roomname, socketId: socket.id })
-    axios.get('http://localhost:3000/users/getMsgs/' + roomname)
+    axios.get('https://diewithme-13.herokuapp.com/users/getMsgs/' + roomname)
       .then(res => {
         if (res.data.success) {
           io.to(socket.id).emit('newUser', res.data.data)
@@ -95,9 +108,8 @@ io.on("connection", (socket) => {
       data: msgs[msgs.length - 1],
       room: room,
     }
-    axios.post('http://localhost:3000/users/newMsg', data)
+    axios.post('https://diewithme-13.herokuapp.com/users/newMsg', data)
       .then(res => {
-        console.log(res.data)
         if (res.data.success) {
           io.in(room).emit('rcv-msg', res.data.msg);
         }
@@ -126,11 +138,12 @@ io.on("connection", (socket) => {
 
   socket.on('msgLike', (data) => {
     console.log(data)
-    axios.patch('http://localhost:3000/users/like', data)
+    axios.patch('https://diewithme-13.herokuapp.com/users/like', data)
       .then(res => {
-        console.log(res.data)
+        const user = getUserId(res.data.user._id)
+        socket.to(user.socketId).emit('likeRecieved', user);
       })
   })
 });
 
-module.exports = app;
+server.listen(port);
