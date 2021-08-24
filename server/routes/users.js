@@ -16,8 +16,9 @@ router.post('/addUser', (req, res) => {
     user = new User({
       name
     });
+  } else {
+    user = new User();
   }
-  user = new User();
   user.save((err, user) => {
     if (err)
       res.json({
