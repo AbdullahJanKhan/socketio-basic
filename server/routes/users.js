@@ -10,10 +10,14 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/addUser', (req, res) => {
-  const name = req.body.name;
-  const user = new User({
-    name
-  });
+  var user
+  if (req.body.name) {
+    const name = req.body.name;
+    user = new User({
+      name
+    });
+  }
+  user = new User();
   user.save((err, user) => {
     if (err)
       res.json({
