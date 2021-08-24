@@ -13,11 +13,7 @@ var port = process.env.PORT || '3000';
 app.set('port', port);
 
 var server = http.createServer(app)
-var io = require('socket.io')(server, {
-  cors: {
-    origin: "*",
-  },
-});
+var io = require("socket.io")(server);
 
 var mongoose = require('mongoose');
 
@@ -26,11 +22,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 
-<<<<<<< HEAD
-const connection = mongoose.connect(process.env.MONGOURI, {
-=======
-const connection = mongoose.connect("uri", {
->>>>>>> 4e73a83a80b292429a92d18fd64fd09a4527daa6
+const connection = mongoose.connect("mongodb+srv://abdullah-isee:admin@isee.qxzb7.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
@@ -91,7 +83,8 @@ const getUserId = (userId) => {
   return users.find((user) => user.userId === userId);
 };
 
-io.on("connection", (socket) => {
+io.on("connection", onConnect);
+function onConnect(socket) {
   //when ceonnect
   //take userId and socketId from user
   socket.on("addUser", ({ username, userId, roomname }) => {
@@ -100,6 +93,7 @@ io.on("connection", (socket) => {
       .then(res => {
         if (res.data.success) {
           io.to(socket.id).emit('newUser', res.data.data)
+          io.to(room).emit('newUserAdded', username + ' join the chat');
         }
       })
   });
@@ -149,6 +143,6 @@ io.on("connection", (socket) => {
         socket.to(user.socketId).emit('likeRecieved', user);
       })
   })
-});
+}
 
 server.listen(port);

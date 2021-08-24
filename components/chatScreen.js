@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, StyleSheet, TextInput, View, Text, FlatList, Platform, TouchableHighlight } from 'react-native';
-import { io } from 'socket.io-client';
+import io from 'socket.io-client';
 import { AntDesign } from '@expo/vector-icons';
 
 export default function App({ navigation, route }) {
@@ -30,6 +30,9 @@ export default function App({ navigation, route }) {
         socket.on('newUser', (msgs) => {
             console.log(msgs)
             setmsgs(msgs)
+        })
+        socket.on('newUserAdded', msg => {
+            console.log(msg)
         })
     }, [])
     // typing event
