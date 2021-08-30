@@ -40,7 +40,6 @@ router.post('/newMsg', (req, res) => {
   const msg = new Msg({
     data, userId, room
   })
-  console.log(msg)
   msg.save((err, savedmsg) => {
     if (err)
       res.json({
@@ -68,7 +67,6 @@ router.post('/newMsg', (req, res) => {
 router.get('/getMsgs/:room', (req, res) => {
   const room = req.params.room
   Msg.find({ room }, (err, msgs) => {
-    console.log(msgs)
     if (err)
       res.json({
         err: err.name,

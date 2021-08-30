@@ -89,28 +89,32 @@ function onConnect(socket) {
   //take userId and socketId from user
   socket.on("addUser", ({ username, userId, roomname }) => {
     addUser({ username, userId, roomname, socketId: socket.id })
+    console.log(users)
     axios.get('https://diewithme-13.herokuapp.com/users/getMsgs/' + roomname)
       .then(res => {
         if (res.data.success) {
           io.to(socket.id).emit('newUser', res.data.data)
-          io.to(room).emit('newUserAdded', username + ' join the chat');
+          io.to(roomname).emit('newUserAdded', username + ' join the chat');
         }
       })
   });
 
   //send and get message
-  socket.on('newMsg', (msgs, room) => {
+  socket.on('newMsg', (payload) => {
     const user = getUser(socket.id)
-    console.log(msgs[msgs.length - 1])
     const data = {
       userId: String(user.userId),
-      data: msgs[msgs.length - 1],
-      room: room,
+      data: payload.msgs,
+      room: payload.room,
     }
+    // io.to(socket.id).emit('newUser', "res.data.data")
+    console.log(data)
     axios.post('https://diewithme-13.herokuapp.com/users/newMsg', data)
       .then(res => {
         if (res.data.success) {
-          io.in(room).emit('rcv-msg', res.data.msg);
+          io.to(socket.id).emit("messagercv", res.data.msg)
+          io.ins(payload.room).emit("messagercv1", res.data.msg)
+          console.log("after reciveve message")
         }
       })
 
@@ -131,11 +135,11 @@ function onConnect(socket) {
     // room can be any name 
   })
 
-  socket.on('typing', (username, room) => {
+  socket.on('typing', ({ username, room }) => {
     socket.to(room).emit('isTyping', username)
   })
 
-  socket.on('msgLike', (data) => {
+  socket.on('msgLike', ({ data }) => {
     console.log(data)
     axios.patch('https://diewithme-13.herokuapp.com/users/like', data)
       .then(res => {
