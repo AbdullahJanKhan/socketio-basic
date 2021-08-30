@@ -113,7 +113,7 @@ function onConnect(socket) {
       .then(res => {
         if (res.data.success) {
           io.to(socket.id).emit("messagercv", res.data.msg)
-          io.ins(payload.room).emit("messagercv1", res.data.msg)
+          io.in(payload.room).emit("messagercv1", res.data.msg)
           console.log("after reciveve message")
         }
       })
