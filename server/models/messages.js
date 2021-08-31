@@ -13,6 +13,9 @@ const messageSchema = new mongoose.Schema({
     },
     time: {
         type: String,
+    },
+    batteryLevel: {
+        type: String,
     }
 });
 

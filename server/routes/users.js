@@ -38,9 +38,10 @@ router.post('/newMsg', (req, res) => {
   const userId = req.body.userId;
   const room = req.body.room;
   const time = req.body.time;
+  const batteryLevel = req.body.batteryLevel;
 
   const msg = new Msg({
-    data, userId, room, time
+    data, userId, room, time, batteryLevel
   })
   msg.save((err, savedmsg) => {
     if (err)
@@ -49,8 +50,9 @@ router.post('/newMsg', (req, res) => {
         success: false
       })
     else {
+      console.log(savedmsg)
       res.json({
-        succes: true,
+        success: true,
         msg: savedmsg,
       })
     }
