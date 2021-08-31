@@ -100,20 +100,20 @@ function onConnect(socket) {
   });
 
   //send and get message
-  socket.on('newMsg', (payload) => {
+  socket.on('newMsg', ({ msgs, room }) => {
     const user = getUser(socket.id)
     const data = {
       userId: String(user.userId),
-      data: payload.msgs,
-      room: payload.room,
+      data: msgs,
+      room: room,
     }
     // io.to(socket.id).emit('newUser', "res.data.data")
     console.log(data)
     axios.post('https://diewithme-13.herokuapp.com/users/newMsg', data)
       .then(res => {
         if (res.data.success) {
-          io.to(socket.id).emit("messagercv", res.data.msg)
-          io.in(payload.room).emit("messagercv1", res.data.msg)
+          io.in(room).emit("messagercv", res.data.msg)
+          // socket.to(room).emit("messagercv1", res.data.msg)
           console.log("after reciveve message")
         }
       })

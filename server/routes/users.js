@@ -47,18 +47,9 @@ router.post('/newMsg', (req, res) => {
         success: false
       })
     else {
-      Msg.find({ room: room }, (err, msgs) => {
-        if (err) {
-          res.json({
-            err: err.name,
-            success: false
-          })
-        }
-        else
-          res.json({
-            msg: msgs,
-            success: true
-          })
+      res.json({
+        succes: true,
+        msg: savedmsg,
       })
     }
   })
