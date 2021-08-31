@@ -100,12 +100,13 @@ function onConnect(socket) {
   });
 
   //send and get message
-  socket.on('newMsg', ({ msgs, room }) => {
+  socket.on('newMsg', ({ msgs, room, time }) => {
     const user = getUser(socket.id)
     const data = {
       userId: String(user.userId),
       data: msgs,
       room: room,
+      time: String(time),
     }
     // io.to(socket.id).emit('newUser', "res.data.data")
     console.log(data)

@@ -37,8 +37,10 @@ router.post('/newMsg', (req, res) => {
   const data = req.body.data;
   const userId = req.body.userId;
   const room = req.body.room;
+  const time = req.body.time;
+
   const msg = new Msg({
-    data, userId, room
+    data, userId, room, time
   })
   msg.save((err, savedmsg) => {
     if (err)
