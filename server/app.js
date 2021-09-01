@@ -141,12 +141,15 @@ function onConnect(socket) {
     socket.to(room).emit('isTyping', username)
   })
 
-  socket.on('msgLike', ({ data }) => {
+  socket.on('msgLike', (data) => {
     console.log(data)
     axios.patch('https://diewithme-13.herokuapp.com/users/like', data)
       .then(res => {
-        const user = getUserId(res.data.user._id)
-        socket.to(user.socketId).emit('likeRecieved', user);
+        if (res.data.success) {
+          const user = getUserId(res.data.user._id)
+          if (user)
+            socket.to(user.socketId).emit('likeRecieved', { likes: res.data.user.likes, newroom: res.data.newroom });
+        }
       })
   })
 }
