@@ -80,30 +80,37 @@ router.patch('/like', (req, res) => {
   const userId = req.body.uid;
   const likeId = req.body.lid;
 
-  User.findOne({ '_id': likeId }, (err, user) => {
+  User.findOneAndUpdate({ '_id': likeId }, { $push: { likes: userId } }, (err, luser) => {
     if (err) {
       res.json({
         err: err.name,
-        success: false
+        success: false,
       })
     } else {
-      user.likes.push(userId)
-      user.save((err, user) => {
+      User.findOne({ '_id': userId }, (err, user) => {
         if (err) {
           res.json({
             err: err.name,
-            success: false
+            success: false,
+            newroom: false,
+          })
+        }
+        else if (user.likes && likeId in user.likes) {
+          res.json({
+            user: luser,
+            success: true,
+            newroom: true,
           })
         } else {
           res.json({
-            user,
-            success: true
+            user: luser,
+            success: true,
+            newroom: false,
           })
         }
       })
+
     }
   })
-
 })
-
 module.exports = router;
