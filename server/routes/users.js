@@ -100,7 +100,7 @@ router.patch('/like', (req, res) => {
       })
       User.findOne({ '_id': userId }, (err, user) => {
         if (err) {
-          res.json({
+          res.json({test
             err: err.name,
             success: false,
             newroom: false,
