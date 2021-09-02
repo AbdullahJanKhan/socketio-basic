@@ -77,6 +77,9 @@ router.get('/getMsgs/:room', (req, res) => {
 })
 
 router.patch('/like', (req, res) => {
+
+  console.log(req.body)
+
   const userId = req.body.uid;
   const likeId = req.body.lid;
 
@@ -90,12 +93,14 @@ router.patch('/like', (req, res) => {
     } else {
       console.log(luser)
       luser.likes = [...new Set(luser.likes)]
-      luser.save((err) => {
+      luser.save((err, user) => {
         if (err) {
           res.json({
             err: err.name
           })
           return;
+        } else {
+          console.log(user)
         }
       })
       User.findOne({ '_id': userId }, (err, user) => {
