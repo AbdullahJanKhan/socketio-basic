@@ -89,14 +89,13 @@ router.patch('/like', (req, res) => {
       })
     } else {
       luser.likes = [...new Set(luser.likes)]
+      console.log(luser.likes)
       luser.save((err, user) => {
         if (err) {
           res.json({
             err: err.name
           })
           return;
-        } else {
-          console.log(user)
         }
       })
       User.findOne({ '_id': userId }, (err, user) => {
