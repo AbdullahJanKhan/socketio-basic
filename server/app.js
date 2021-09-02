@@ -24,7 +24,8 @@ var usersRouter = require('./routes/users');
 
 const connection = mongoose.connect("mongodb+srv://abdullah-isee:admin@isee.qxzb7.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  useFindAndModify: false,
 });
 connection.then((db) => {
   console.log("Connected correctly to server");
