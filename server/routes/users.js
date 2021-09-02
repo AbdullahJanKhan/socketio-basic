@@ -78,20 +78,16 @@ router.get('/getMsgs/:room', (req, res) => {
 
 router.patch('/like', (req, res) => {
 
-  console.log(req.body)
-
   const userId = req.body.uid;
   const likeId = req.body.lid;
 
   User.findOneAndUpdate({ _id: likeId }, { $push: { likes: userId } }, { returnOriginal: false }, (err, luser) => {
-    console.log(luser)
     if (err) {
       res.json({
         err: err.name,
         success: false,
       })
     } else {
-      console.log(luser)
       luser.likes = [...new Set(luser.likes)]
       luser.save((err, user) => {
         if (err) {

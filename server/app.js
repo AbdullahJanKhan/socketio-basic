@@ -147,6 +147,7 @@ function onConnect(socket) {
     axios.patch('https://diewithme-13.herokuapp.com/users/like', data)
       .then(res => {
         if (res.data.success) {
+          console.log(res.data)
           const user = getUserId(res.data.user._id)
           if (user)
             socket.to(user.socketId).emit('likeRecieved', { likes: res.data.user.likes, newroom: res.data.newroom });
