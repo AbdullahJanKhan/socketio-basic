@@ -80,7 +80,7 @@ router.patch('/like', (req, res) => {
   const userId = req.body.uid;
   const likeId = req.body.lid;
 
-  User.findOneAndUpdate({ '_id': likeId }, { $push: { likes: userId } }, { new: true }, (err, luser) => {
+  User.findOneAndUpdate({ _id: likeId }, { $push: { likes: userId } }, { returnOriginal: false }, (err, luser) => {
     console.log(luser)
     if (err) {
       res.json({
