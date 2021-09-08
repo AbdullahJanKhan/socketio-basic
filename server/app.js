@@ -148,9 +148,15 @@ function onConnect(socket) {
       .then(res => {
         if (res.data.success) {
           console.log(res.data)
-          const user = getUserId(res.data.user._id)
-          if (user)
-            socket.to(user.socketId).emit('likeRecieved', { likes: res.data.user.likes, newroom: res.data.newroom });
+          const likeUser = getUserId(data.lid)
+          const srcUser = getUserId(data.uid)
+          if (likeUser && srcUser)
+            if (res.data.newRoom) {
+              socket.to(likeUser.socketId).emit('newroom', { likes: res.data.user.likes, roomname: res.data.roomname });
+              socket.to(srcUser.socketId).emit('newroom', { likes: res.data.user.likes, roomname: res.data.roomname });
+            } else {
+              socket.to(likeUser.socketId).emit('likeRecieved', { likes: res.data.user.likes });
+            }
         }
       })
   })

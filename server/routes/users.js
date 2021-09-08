@@ -3,6 +3,7 @@ var router = express.Router();
 
 const User = require('../models/user');
 const Msg = require('../models/messages');
+const Room = require('../models/rooms');
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
@@ -81,46 +82,81 @@ router.patch('/like', (req, res) => {
   const userId = req.body.uid;
   const likeId = req.body.lid;
 
-  User.findOneAndUpdate({ _id: likeId }, { $push: { likes: userId } }, { returnOriginal: false }, (err, luser) => {
+  User.findById(likeId, (err, likedUser) => {
+    if (err) {
+      res.json({
+        success: false,
+        err: err.name
+      })
+    }
+    else if (likedUser.likes.includes(userId)) {
+      // both have liked each other
+      // or like already exists
+      res.json({
+        success: true,
+        user: likedUser,
+      })
+    } else {
+      likedUser.likes.push(userId)
+      likedUser.save((err, data) => {
+        if (err)
+          res.json({
+            success: false,
+            err: err.name
+          })
+        else {
+          User.findById(userId, (err, srcUser) => {
+            if (err) {
+              res.json({
+                success: false,
+                err: err.name
+              })
+            } else if (srcUser.likes.includes(likeId)) {
+              const room = new Room({
+                users: [userId, likeId]
+              })
+              room.save((err, roomId) => {
+                if (err) {
+                  res.json({
+                    err: err.name,
+                    success: false,
+                    newRoom: true,
+                  })
+                } else {
+                  res.json({
+                    success: true,
+                    user: data,
+                    newRoom: true,
+                    roomname: roomId._id
+                  })
+                }
+              })
+            } else {
+              res.json({
+                success: true,
+                user: data,
+                newRoom: false
+              })
+            }
+          })
+        }
+      })
+    }
+  })
+})
+
+router.get("allRooms", (req, res) => {
+  Room.find({}, (err, rooms) => {
     if (err) {
       res.json({
         err: err.name,
         success: false,
       })
     } else {
-      luser.likes = [...new Set(luser.likes)]
-      console.log(luser.likes)
-      luser.save((err, user) => {
-        if (err) {
-          res.json({
-            err: err.name
-          })
-          return;
-        }
+      res.json({
+        rooms,
+        success: true,
       })
-      User.findOne({ '_id': userId }, (err, user) => {
-        if (err) {
-          res.json({test
-            err: err.name,
-            success: false,
-            newroom: false,
-          })
-        }
-        else if (user.likes && likeId in user.likes) {
-          res.json({
-            user: luser,
-            success: true,
-            newroom: true,
-          })
-        } else {
-          res.json({
-            user: luser,
-            success: true,
-            newroom: false,
-          })
-        }
-      })
-
     }
   })
 })
